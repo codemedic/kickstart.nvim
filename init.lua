@@ -929,5 +929,37 @@ require('lazy').setup({
   },
 })
 
+-- GUI Settings
+if vim.fn.has 'gui_running' == 1 then
+  vim.g.transparency = 0.8
+  vim.o.guifont = 'IosevkaTerm Nerd Font Mono:h13'
+
+  -- Neovide settings
+  if vim.g.neovide then
+    -- Helper function for transparency formatting
+    local alpha = function()
+      return string.format('%x', math.floor((255 * vim.g.transparency) or 0.8))
+    end
+    -- g:neovide_transparency should be 0 if you want to unify transparency of content and title bar.
+    vim.g.neovide_transparency = 0.8
+    vim.g.neovide_background_color = '#0f1117' .. alpha()
+    vim.g.neovide_window_blurred = true
+    vim.g.neovide_scale_factor = 0.87
+    -- Determines the time it takes for a window to complete animation from one position to
+    -- another position in seconds, such as :split. Set to 0 to disable.
+    -- vim.g.neovide_position_animation_length = 0.55
+
+    -- Setting g:neovide_cursor_animation_length determines the time it takes for the cursor
+    -- to complete it's animation in seconds. Set to 0 to disable.
+    vim.g.neovide_cursor_animation_length = 0.05
+
+    -- Setting g:neovide_cursor_trail_size determines how much the trail of the cursor lags behind the front edge.
+    vim.g.neovide_cursor_trail_size = 0.3
+
+    vim.g.neovide_cursor_animate_in_insert_mode = true
+    vim.g.neovide_cursor_vfx_mode = 'pixiedust'
+  end
+end
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
