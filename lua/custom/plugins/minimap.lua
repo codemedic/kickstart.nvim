@@ -6,8 +6,7 @@ return {
     local minimap = require 'mini.map'
     return {
       symbols = {
-        -- encode = minimap.gen_encode_symbols.dot '4x2',
-        encode = minimap.gen_encode_symbols.shade '2x1',
+        encode = minimap.gen_encode_symbols.dot '4x2',
         scroll_line = '',
         scroll_view = '▒',
       },
