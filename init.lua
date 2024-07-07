@@ -595,7 +595,16 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
-        --
+        ltex = {
+          cmd = { 'ltex-ls' },
+          -- filetypes = { 'markdown', 'text' },
+          flags = { debounce_text_changes = 300 },
+          settings = {
+            ltex = {
+              language = 'en-GB',
+            },
+          },
+        },
 
         lua_ls = {
           -- cmd = {...},
