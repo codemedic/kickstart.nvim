@@ -14,6 +14,9 @@ return {
     { '\\', ':Neotree reveal<CR>', { desc = 'NeoTree reveal' } },
   },
   opts = {
+    update_focused_file = {
+      enable = true,
+    },
     filesystem = {
       window = {
         mappings = {
