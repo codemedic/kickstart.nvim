@@ -759,7 +759,24 @@ require('lazy').setup({
           --  This will expand snippets if the LSP sent a snippet.
           ['<C-y>'] = cmp.mapping.confirm { select = true },
           -- Enable Tab key to confirm completion
-          ['<Tab>'] = cmp.mapping.confirm { select = true },
+          ['<Tab>'] = cmp.mapping(function(fallback)
+            if luasnip.expandable() then
+              luasnip.expand()
+            elseif luasnip.locally_jumpable(1) then
+              luasnip.jump(1)
+            elseif cmp.visible() then
+              cmp.confirm { select = true }
+            else
+              fallback()
+            end
+          end),
+          ['<S-Tab>'] = cmp.mapping(function(fallback)
+            if luasnip.locally_jumpable(-1) then
+              luasnip.jump(-1)
+            else
+              fallback()
+            end
+          end),
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
