@@ -959,6 +959,8 @@ if vim.fn.has 'gui_running' == 1 then
   vim.g.transparency = 0.8
   vim.o.guifont = 'IosevkaTerm Nerd Font Mono:h13'
 
+  local map = vim.api.nvim_set_keymap
+
   -- Neovide settings
   if vim.g.neovide then
     -- Helper function for transparency formatting
@@ -974,36 +976,31 @@ if vim.fn.has 'gui_running' == 1 then
     -- another position in seconds, such as :split. Set to 0 to disable.
     -- vim.g.neovide_position_animation_length = 0.55
 
-    -- Setting g:neovide_cursor_animation_length determines the time it takes for the cursor
-    -- to complete it's animation in seconds. Set to 0 to disable.
-    vim.g.neovide_cursor_animation_length = 0.03
+    -- Disable various animations
+    vim.g.neovide_cursor_animation_length = 0
+    vim.g.neovide_scroll_animation_length = 0
+    vim.g.neovide_cursor_trail_size = 0
+    vim.g.neovide_cursor_animate_in_insert_mode = false
 
-    -- Setting g:neovide_cursor_trail_size determines how much the trail of the cursor lags behind the front edge.
-    vim.g.neovide_cursor_trail_size = 0.3
-
-    vim.g.neovide_cursor_animate_in_insert_mode = true
+    -- Do keep the fairy dust!
     vim.g.neovide_cursor_vfx_mode = 'pixiedust'
-
     vim.g.neovide_cursor_vfx_opacity = 300.0
 
     vim.g.gui_min_scale_factor = 0.4
     vim.g.gui_max_scale_factor = 2.2
     vim.g.gui_default_scale_factor = 0.87
     vim.g.neovide_scale_factor = vim.g.gui_default_scale_factor
-    vim.api.nvim_set_keymap(
-      'n',
-      '<C-+>',
-      ':lua vim.g.neovide_scale_factor = math.min(vim.g.gui_max_scale_factor, vim.g.neovide_scale_factor + 0.1)<CR>',
-      { silent = true }
-    )
-    vim.api.nvim_set_keymap(
-      'n',
-      '<C-->',
-      ':lua vim.g.neovide_scale_factor = math.max(vim.g.gui_min_scale_factor, vim.g.neovide_scale_factor - 0.1)<CR>',
-      { silent = true }
-    )
-    vim.api.nvim_set_keymap('n', '<C-0>', ':lua vim.g.neovide_scale_factor = vim.g.gui_default_scale_factor<CR>', { silent = true })
+
+    -- Scale UI font
+    map('n', '<C-+>', ':lua vim.g.neovide_scale_factor = math.min(vim.g.gui_max_scale_factor, vim.g.neovide_scale_factor + 0.1)<CR>', { silent = true })
+    map('n', '<C-->', ':lua vim.g.neovide_scale_factor = math.max(vim.g.gui_min_scale_factor, vim.g.neovide_scale_factor - 0.1)<CR>', { silent = true })
+    -- Reset UI font
+    map('n', '<C-0>', ':lua vim.g.neovide_scale_factor = vim.g.gui_default_scale_factor<CR>', { silent = true })
   end
+
+  -- Recreate functionality, usually provided by terminal app
+  map('i', '<S-Insert>', '<C-r>+', { noremap = true, silent = true })
+  map('i', '<C-S-Insert>', '<C-r>+', { noremap = true, silent = true })
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
