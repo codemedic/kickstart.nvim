@@ -959,7 +959,7 @@ require('lazy').setup({
 
 -- GUI Settings
 if vim.fn.has 'gui_running' == 1 then
-  vim.g.transparency = 0.8
+  vim.g.transparency = 0.95
   vim.o.guifont = 'IosevkaTerm Nerd Font Mono:h13'
 
   local map = vim.api.nvim_set_keymap
@@ -991,7 +991,7 @@ if vim.fn.has 'gui_running' == 1 then
 
     vim.g.gui_min_scale_factor = 0.4
     vim.g.gui_max_scale_factor = 2.2
-    vim.g.gui_default_scale_factor = 0.87
+    vim.g.gui_default_scale_factor = 1
     vim.g.neovide_scale_factor = vim.g.gui_default_scale_factor
 
     -- Scale UI font
