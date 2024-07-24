@@ -764,7 +764,10 @@ require('lazy').setup({
             elseif luasnip.locally_jumpable(1) then
               luasnip.jump(1)
             elseif cmp.visible() then
-              cmp.confirm { select = true }
+              cmp.confirm {
+                behavior = cmp.ConfirmBehavior.Replace,
+                select = true,
+              }
             else
               fallback()
             end
