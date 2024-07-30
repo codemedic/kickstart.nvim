@@ -91,6 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
+vim.g.have_nerd_font = (vim.fn.has 'gui_running' ~= 1)
 vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
@@ -967,7 +968,7 @@ require('lazy').setup({
 -- GUI Settings
 if vim.fn.has 'gui_running' == 1 then
   vim.g.transparency = 0.95
-  vim.o.guifont = 'IosevkaTerm Nerd Font Mono:h13'
+  vim.opt.guifont = { 'Iosevka Term SS14', 'Ubuntu Mono', ':h12' }
 
   local map = vim.api.nvim_set_keymap
 
