@@ -745,6 +745,7 @@ require('lazy').setup({
       -- Snippet Engine & its associated nvim-cmp source
       {
         'L3MON4D3/LuaSnip',
+        version = 'v2.*',
         build = (function()
           -- Build Step is needed for regex support in snippets.
           -- This step is not supported in many windows environments.
@@ -1007,7 +1008,10 @@ require('lazy').setup({
 -- GUI Settings
 if vim.fn.has 'gui_running' == 1 then
   vim.g.transparency = 0.95
-  vim.opt.guifont = { 'Iosevka Term SS14', 'Ubuntu Mono', ':h12' }
+  vim.opt.guifont = {
+    'Iosevka Term SS14 Light',
+    'Ubuntu Mono',
+  }
 
   local map = vim.api.nvim_set_keymap
 
@@ -1038,7 +1042,7 @@ if vim.fn.has 'gui_running' == 1 then
 
     vim.g.gui_min_scale_factor = 0.4
     vim.g.gui_max_scale_factor = 2.2
-    vim.g.gui_default_scale_factor = 1
+    vim.g.gui_default_scale_factor = 0.9
     vim.g.neovide_scale_factor = vim.g.gui_default_scale_factor
 
     -- Scale UI font
