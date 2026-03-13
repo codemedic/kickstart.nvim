@@ -1,3 +1,5 @@
+-- Add indentation guides even on blank lines
+
 ---@module 'lazy'
 ---@type LazySpec
 return {
@@ -8,7 +10,6 @@ return {
     main = 'ibl',
     ---@module 'ibl'
     ---@type ibl.config
-    opts = {},
     event = { 'BufReadPost', 'BufNewFile' },
     opts = {
       indent = {
