@@ -4,13 +4,14 @@ local is_git_ignored = function(filepath)
 end
 
 local update_left_pane = function()
-  pcall(function()
-    local lib = require 'diffview.lib'
-    local view = lib.get_current_view()
-    if view then
-      view:update_files()
-    end
-  end)
+  -- Guard: only proceed if diffview.lib is already loaded to avoid caching a
+  -- failed require(), which would cause "previous error loading module" errors.
+  if not package.loaded['diffview.lib'] then return end
+  local lib = require 'diffview.lib'
+  local view = lib.get_current_view()
+  if view then
+    view:update_files()
+  end
 end
 
 require('custom.directory-watcher').registerOnChangeHandler('diffview', function(filepath, events)
