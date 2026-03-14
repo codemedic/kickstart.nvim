@@ -177,34 +177,33 @@ end
 ---@param index integer
 local function show_float(index)
   local tip = tips[index]
-  local max_width = math.floor(vim.o.columns * 0.45)
+  local max_width = math.floor(vim.o.columns * 0.32)
 
   -- Word-wrap long desc to fit within max_width
   local desc = tip.desc
   local desc_lines = {}
   while #desc > max_width do
     local break_at = desc:sub(1, max_width):match '.*()%s' or max_width
-    desc_lines[#desc_lines + 1] = '  ' .. desc:sub(1, break_at - 1)
+    desc_lines[#desc_lines + 1] = ' ' .. desc:sub(1, break_at - 1)
     desc = desc:sub(break_at + 1)
   end
-  desc_lines[#desc_lines + 1] = '  ' .. desc
+  desc_lines[#desc_lines + 1] = ' ' .. desc
 
   local leader = vim.g.mapleader == ' ' and '<Space>' or (vim.g.mapleader or '\\')
   local lines = {
-    '  Tip of the Day  ',
-    '  <leader> = ' .. leader,
+    ' Tip of the Day',
+    ' <leader> = ' .. leader,
     '',
-    '  ' .. tip.keys,
+    ' ' .. tip.keys,
     '',
   }
   for _, l in ipairs(desc_lines) do
     lines[#lines + 1] = l
   end
   lines[#lines + 1] = ''
-  lines[#lines + 1] = '  ' .. tip.category
-  lines[#lines + 1] = string.format('  %d / %d', index, #tips)
+  lines[#lines + 1] = ' ' .. tip.category .. '  ·  ' .. string.format('%d / %d', index, #tips)
   lines[#lines + 1] = ''
-  lines[#lines + 1] = '  n / <Tab>  next    c  category    q / <Esc>  dismiss'
+  lines[#lines + 1] = ' n·next  c·category  q·dismiss'
 
   local width = 0
   for _, l in ipairs(lines) do
@@ -231,6 +230,7 @@ local function show_float(index)
     border = 'rounded',
     noautocmd = true,
   })
+  vim.wo[win].winblend = 25
 
   local ns = vim.api.nvim_create_namespace 'keytips'
   vim.api.nvim_buf_add_highlight(buf, ns, 'Title',   0,          0, -1)
@@ -274,7 +274,7 @@ local function show_float(index)
     elapsed = elapsed + 1
     local remaining = ADVANCE_SECS - elapsed
     if remaining <= COUNTDOWN_SECS and remaining > 0 then
-      set_hint(string.format('  advancing in %ds …   c  category    q / <Esc>  dismiss', remaining))
+      set_hint(string.format(' advancing in %ds…  c·category  q·dismiss', remaining))
     end
   end))
 
