@@ -165,17 +165,6 @@ vim.o.scrolloff = 10
 -- See `:help 'confirm'`
 vim.o.confirm = true
 
-vim.o.sidescrolloff = 8 -- Columns of context
-
-vim.o.pumblend = 10 -- Popup blend
-vim.o.relativenumber = true -- Relative line numbers
-
-vim.o.tabstop = 4 -- Number of spaces tabs count for
-vim.o.shiftwidth = 4 -- Size of an indent
-
-vim.o.smartindent = true -- Insert indents automatically
-vim.opt.spelllang = { 'en_gb' }
-
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -200,6 +189,7 @@ vim.diagnostic.config {
 }
 
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -414,8 +404,6 @@ require('lazy').setup({
       -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
-      pcall(require('telescope').load_extension, 'refactoring')
-
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
@@ -429,10 +417,6 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader>sc', builtin.commands, { desc = '[S]earch [C]ommands' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-
-      vim.keymap.set({ 'n', 'x' }, '<leader>rr', function()
-        require('telescope').extensions.refactoring.refactors()
-      end)
 
       -- This runs on LSP attach per buffer (see main LSP attach function in 'neovim/nvim-lspconfig' config for more info,
       -- it is better explained there). This allows easily switching between pickers if you prefer using something else!
@@ -968,58 +952,6 @@ require('lazy').setup({
     },
   },
 })
-
--- GUI Settings
-if vim.fn.has 'gui_running' == 1 then
-  vim.g.transparency = 0.95
-  vim.opt.guifont = {
-    'Iosevka Term SS14 Light',
-    'Ubuntu Mono',
-  }
-
-  local map = vim.api.nvim_set_keymap
-
-  -- Neovide settings
-  if vim.g.neovide then
-    -- Helper function for transparency formatting
-    local alpha = function()
-      return string.format('%x', math.floor((255 * vim.g.transparency) or 0.8))
-    end
-    -- g:neovide_transparency should be 0 if you want to unify transparency of content and title bar.
-    vim.g.neovide_transparency = vim.g.transparency
-    vim.g.neovide_background_color = '#0f1117' .. alpha()
-    vim.g.neovide_window_blurred = true
-
-    -- Determines the time it takes for a window to complete animation from one position to
-    -- another position in seconds, such as :split. Set to 0 to disable.
-    -- vim.g.neovide_position_animation_length = 0.55
-
-    -- Disable various animations
-    vim.g.neovide_cursor_animation_length = 0
-    vim.g.neovide_scroll_animation_length = 0
-    vim.g.neovide_cursor_trail_size = 0
-    vim.g.neovide_cursor_animate_in_insert_mode = false
-
-    -- Do keep the fairy dust!
-    vim.g.neovide_cursor_vfx_mode = 'pixiedust'
-    vim.g.neovide_cursor_vfx_opacity = 300.0
-
-    vim.g.gui_min_scale_factor = 0.4
-    vim.g.gui_max_scale_factor = 2.2
-    vim.g.gui_default_scale_factor = 0.9
-    vim.g.neovide_scale_factor = vim.g.gui_default_scale_factor
-
-    -- Scale UI font
-    map('n', '<C-+>', ':lua vim.g.neovide_scale_factor = math.min(vim.g.gui_max_scale_factor, vim.g.neovide_scale_factor + 0.1)<CR>', { silent = true })
-    map('n', '<C-->', ':lua vim.g.neovide_scale_factor = math.max(vim.g.gui_min_scale_factor, vim.g.neovide_scale_factor - 0.1)<CR>', { silent = true })
-    -- Reset UI font
-    map('n', '<C-0>', ':lua vim.g.neovide_scale_factor = vim.g.gui_default_scale_factor<CR>', { silent = true })
-  end
-
-  -- Recreate functionality, usually provided by terminal app
-  map('i', '<S-Insert>', '<C-r>+', { noremap = true, silent = true })
-  map('i', '<C-S-Insert>', '<C-r>+', { noremap = true, silent = true })
-end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

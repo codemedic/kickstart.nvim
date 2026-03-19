@@ -88,6 +88,12 @@ local tips = {
   { category = 'Terminal', keys = '<leader>tt',          desc = 'Toggle the floating terminal' },
   { category = 'Terminal', keys = '<Esc><Esc>',          desc = 'Exit terminal mode and return to normal mode' },
 
+  -- ── Editing: commenting ───────────────────────────────────────────────
+  { category = 'Editing', keys = '<C-/>',               desc = 'Toggle comment — line (normal/insert, moves down) or selection (visual)' },
+
+  -- ── Editing: insert mode ──────────────────────────────────────────────
+  { category = 'Editing', keys = '<C-BS> / <M-BS>',     desc = 'Delete word backwards in insert mode' },
+
   -- ── Misc ──────────────────────────────────────────────────────────────
   { category = 'Misc', keys = '<Esc>',                   desc = 'Clear the search highlight without moving the cursor' },
 }
