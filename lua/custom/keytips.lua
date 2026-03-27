@@ -6,6 +6,11 @@
 
 local M = {}
 
+--- Module config — override via M.setup({ position = 'top-right' })
+---@type { position: 'top-right'|'bottom-right' }
+local config = {
+  position = 'bottom-right',
+}
 
 ---@alias Tip { keys: string, desc: string, category: string }
 
@@ -100,6 +105,12 @@ local tips = {
 
 -- Tracks the current tip index across calls; seeded from day-of-year on first show.
 local current_index = nil
+-- Counts how many times the popup has auto-advanced in the current startup sequence.
+local advance_count = 0
+-- Handle to the currently open tip window, so we can close it before opening another.
+local current_win = nil
+-- Close function of the currently open float, so toggle_manual can stop its timers.
+local current_close = nil
 
 --- Open a centered floating window listing all tips for a given category.
 ---@param category string
@@ -181,7 +192,14 @@ end
 
 --- Open a floating window for the tip at `index`. Dismiss with q/<Esc>, next with n/<Tab>.
 ---@param index integer
-local function show_float(index)
+---@param auto_advance boolean  When true, timers run and the popup auto-cycles (up to 2 times).
+local function show_float(index, auto_advance)
+  -- Close any existing tip window before opening a new one.
+  if current_win and vim.api.nvim_win_is_valid(current_win) then
+    vim.api.nvim_win_close(current_win, true)
+    current_win = nil
+  end
+
   local tip = tips[index]
   local max_width = math.floor(vim.o.columns * 0.32)
 
@@ -225,10 +243,14 @@ local function show_float(index)
   local ui = vim.api.nvim_list_uis()[1]
   local col = ui and (ui.width - width - 2) or 10
 
+  -- Position: top-right anchors NE at row 1; bottom-right anchors SE near statusline.
+  local anchor = config.position == 'top-right' and 'NE' or 'SE'
+  local row    = config.position == 'top-right' and 1 or (vim.o.lines - 2)
+
   local win = vim.api.nvim_open_win(buf, false, {
     relative = 'editor',
-    anchor = 'NE',
-    row = 1,
+    anchor = anchor,
+    row = row,
     col = col,
     width = width,
     height = #lines,
@@ -237,6 +259,7 @@ local function show_float(index)
     noautocmd = true,
   })
   vim.wo[win].winblend = 25
+  current_win = win
 
   local ns = vim.api.nvim_create_namespace 'keytips'
   vim.api.nvim_buf_add_highlight(buf, ns, 'Title',   0,          0, -1)
@@ -246,12 +269,13 @@ local function show_float(index)
   vim.api.nvim_buf_add_highlight(buf, ns, 'Comment', #lines - 3, 0, -1)  -- counter
   vim.api.nvim_buf_add_highlight(buf, ns, 'Comment', #lines - 1, 0, -1)  -- hint
 
-  local ADVANCE_SECS = 30
+  local ADVANCE_SECS   = 30
   local COUNTDOWN_SECS = 5
+  local MAX_AUTO_ADVANCES = 2
   local hint_line = #lines - 1  -- 0-indexed; last line is the hint
 
-  local advance_timer = vim.uv.new_timer()
-  local tick_timer    = vim.uv.new_timer()
+  local advance_timer = auto_advance and vim.uv.new_timer() or nil
+  local tick_timer    = auto_advance and vim.uv.new_timer() or nil
 
   local function set_hint(text)
     if not vim.api.nvim_buf_is_valid(buf) then return end
@@ -261,30 +285,47 @@ local function show_float(index)
   end
 
   local function close()
-    advance_timer:stop()
-    tick_timer:stop()
+    if advance_timer then advance_timer:stop() end
+    if tick_timer    then tick_timer:stop()    end
     if vim.api.nvim_win_is_valid(win) then
       vim.api.nvim_win_close(win, true)
     end
+    if current_win == win then current_win = nil end
+    if current_close == close then current_close = nil end
   end
+
+  current_close = close
 
   local function next_tip()
     close()
     current_index = (current_index % #tips) + 1
-    show_float(current_index)
+    show_float(current_index, auto_advance)
   end
 
-  -- Tick every second; update hint only during the final countdown
-  local elapsed = 0
-  tick_timer:start(1000, 1000, vim.schedule_wrap(function()
-    elapsed = elapsed + 1
-    local remaining = ADVANCE_SECS - elapsed
-    if remaining <= COUNTDOWN_SECS and remaining > 0 then
-      set_hint(string.format(' advancing in %ds…  c·category  q·dismiss', remaining))
-    end
-  end))
+  if auto_advance then
+    -- Tick every second; update hint only during the final countdown
+    local elapsed = 0
+    tick_timer:start(1000, 1000, vim.schedule_wrap(function()
+      elapsed = elapsed + 1
+      local remaining = ADVANCE_SECS - elapsed
+      if remaining <= COUNTDOWN_SECS and remaining > 0 then
+        if advance_count < MAX_AUTO_ADVANCES then
+          set_hint(string.format(' advancing in %ds…  c·category  q·dismiss', remaining))
+        end
+        -- On the final timeout the popup just disappears — no hint needed
+      end
+    end))
 
-  advance_timer:start(ADVANCE_SECS * 1000, 0, vim.schedule_wrap(next_tip))
+    advance_timer:start(ADVANCE_SECS * 1000, 0, vim.schedule_wrap(function()
+      if advance_count < MAX_AUTO_ADVANCES then
+        advance_count = advance_count + 1
+        next_tip()
+      else
+        -- User isn't engaging — just hide silently
+        close()
+      end
+    end))
+  end
 
   for _, key in ipairs { 'q', '<Esc>' } do
     vim.keymap.set('n', key, close, { buffer = buf, silent = true, nowait = true })
@@ -298,16 +339,35 @@ local function show_float(index)
   end, { buffer = buf, silent = true, nowait = true })
 end
 
---- Show today's tip, rotating by day-of-year. Subsequent :KeyTip calls resume from current position.
+--- Show today's tip at startup. Resets the auto-advance counter and enables auto-cycling.
 function M.show()
   if current_index == nil then
     local day = tonumber(os.date '%j') or 1
     current_index = ((day - 1) % #tips) + 1
   end
-  show_float(current_index)
+  advance_count = 0
+  show_float(current_index, true)
 end
 
-function M.setup()
+--- Toggle the tip popup. If visible, close it; otherwise show current tip without auto-advance.
+local function toggle_manual()
+  if current_win and vim.api.nvim_win_is_valid(current_win) then
+    if current_close then current_close() end
+    return
+  end
+  if current_index == nil then
+    local day = tonumber(os.date '%j') or 1
+    current_index = ((day - 1) % #tips) + 1
+  end
+  show_float(current_index, false)
+end
+
+---@param opts? { position?: 'top-right'|'bottom-right' }
+function M.setup(opts)
+  if opts then
+    config = vim.tbl_deep_extend('force', config, opts)
+  end
+
   vim.api.nvim_create_autocmd('User', {
     pattern = 'LazyDone',
     once = true,
@@ -316,7 +376,7 @@ function M.setup()
     end,
   })
 
-  vim.api.nvim_create_user_command('KeyTip', M.show, { desc = 'Show keybinding tip of the day' })
+  vim.api.nvim_create_user_command('KeyTip', toggle_manual, { desc = 'Toggle keybinding tip of the day' })
 end
 
 return M
