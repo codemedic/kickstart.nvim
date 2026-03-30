@@ -58,6 +58,14 @@ local tips = {
   { category = 'LSP', keys = 'gW',                      desc = 'Browse all symbols across the entire workspace' },
   { category = 'LSP', keys = '<leader>th',              desc = 'Toggle inlay hints (inline type / parameter annotations)' },
 
+  -- ── Completion (blink.cmp) ────────────────────────────────────────────
+  { category = 'Completion', keys = '<Tab>',              desc = 'Accept the pre-selected (first) completion item — like JetBrains IDEs' },
+  { category = 'Completion', keys = '<S-Tab>',            desc = 'Select the previous completion item' },
+  { category = 'Completion', keys = '<C-n> / <C-p>',     desc = 'Move down / up through the completion list' },
+  { category = 'Completion', keys = '<C-e>',              desc = 'Dismiss the completion menu' },
+  { category = 'Completion', keys = '<C-k>',              desc = 'Toggle function signature help' },
+  { category = 'Completion', keys = '<C-Space>',          desc = 'Open the completion menu (or show docs if already open)' },
+
   -- ── Formatting ────────────────────────────────────────────────────────
   { category = 'Editing', keys = '<leader>f',            desc = 'Format the current buffer using the configured formatter' },
 
