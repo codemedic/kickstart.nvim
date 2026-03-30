@@ -30,6 +30,7 @@ local tips = {
   { category = 'Splits', keys = '<leader>ssj / ssk',    desc = 'Swap current buffer with the split below / above' },
 
   -- ── Buffers ───────────────────────────────────────────────────────────
+  { category = 'Buffers', keys = '<C-PageUp> / <C-PageDown>', desc = 'Switch to the previous / next buffer tab' },
   { category = 'Buffers', keys = '<leader><Space>',      desc = 'Fuzzy-pick from all open buffers' },
 
   -- ── Search (Telescope) ────────────────────────────────────────────────
