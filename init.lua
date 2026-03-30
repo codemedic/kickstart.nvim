@@ -91,7 +91,6 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
 vim.g.have_nerd_font = (vim.fn.has 'gui_running' ~= 1)
 
 -- [[ Setting options ]]
@@ -601,12 +600,6 @@ require('lazy').setup({
       --  See `:help lsp-config` for information about keys and how to configure
       ---@type table<string, vim.lsp.Config>
       local servers = {
-        clangd = {},
-        gopls = {},
-        bashls = {},
-        cmake = {},
-        docker_compose_language_service = {},
-        dockerls = {},
         -- pyright = {},
         -- rust_analyzer = {},
         --
@@ -657,7 +650,8 @@ require('lazy').setup({
       -- You can press `g?` for help in this menu.
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
-        -- You can add other tools here that you want Mason to install
+        -- Custom LSP servers — managed via after/plugin/lsp-servers.lua
+        'clangd', 'gopls', 'bashls', 'cmake', 'docker_compose_language_service', 'dockerls', 'pyright', 'rust_analyzer',
       })
 
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
