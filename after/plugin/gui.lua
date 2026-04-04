@@ -4,7 +4,7 @@ if vim.fn.has 'gui_running' ~= 1 then return end
 
 vim.g.transparency = 0.95
 vim.opt.guifont = {
-  'Iosevka Term SS14 Light',
+  'Iosevka Term',
   'Ubuntu Mono',
 }
 
