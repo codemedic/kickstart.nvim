@@ -108,6 +108,13 @@ local tips = {
   -- ── Editing: insert mode ──────────────────────────────────────────────
   { category = 'Editing', keys = '<C-BS> / <M-BS>',     desc = 'Delete word backwards in insert mode' },
 
+  -- ── Folds ─────────────────────────────────────────────────────────────
+  { category = 'Folds', keys = 'zo / zc',                desc = 'Open / close one fold under cursor' },
+  { category = 'Folds', keys = 'zO / zC',                desc = 'Open / close all folds under cursor (recursive)' },
+  { category = 'Folds', keys = 'za',                     desc = 'Toggle fold under cursor' },
+  { category = 'Folds', keys = 'zr / zm',                desc = 'Open / close one more fold level globally' },
+  { category = 'Folds', keys = 'zR / zM',                desc = 'Open / close ALL fold levels' },
+
   -- ── Misc ──────────────────────────────────────────────────────────────
   { category = 'Misc', keys = '<Esc>',                   desc = 'Clear the search highlight without moving the cursor' },
 }
