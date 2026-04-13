@@ -81,14 +81,18 @@ local tips = {
   -- ── Git: hunks ────────────────────────────────────────────────────────
   { category = 'Git', keys = ']c / [c',                  desc = 'Jump to the next / previous git change in the file' },
   { category = 'Git', keys = '<leader>hp',               desc = 'Preview the git diff for the hunk under the cursor' },
+  { category = 'Git', keys = '<leader>hi',               desc = 'Preview the hunk diff inline (in the buffer)' },
   { category = 'Git', keys = '<leader>hs',               desc = 'Stage the hunk under the cursor' },
   { category = 'Git', keys = '<leader>hr',               desc = 'Reset (discard) the hunk under the cursor back to HEAD' },
   { category = 'Git', keys = '<leader>hS',               desc = 'Stage every change in the current buffer at once' },
   { category = 'Git', keys = '<leader>hR',               desc = 'Reset every change in the current buffer back to HEAD' },
-  { category = 'Git', keys = '<leader>hb',               desc = 'Show the git blame annotation for the current line' },
+  { category = 'Git', keys = '<leader>hb',               desc = 'Show the full git blame for the current line' },
   { category = 'Git', keys = '<leader>hd',               desc = 'Open a diff view of the buffer against the git index' },
   { category = 'Git', keys = '<leader>hD',               desc = 'Open a diff view of the buffer against the last commit' },
+  { category = 'Git', keys = '<leader>hq / hQ',          desc = 'Send hunks to quickfix list (current file / all files)' },
   { category = 'Git', keys = '<leader>tb',               desc = 'Toggle inline git blame annotations on every line' },
+  { category = 'Git', keys = '<leader>tw',               desc = 'Toggle word-level diff highlighting' },
+  { category = 'Git', keys = 'ih  (visual/operator)',    desc = 'Text object: select the current hunk' },
 
   -- ── Diagnostics / Trouble ─────────────────────────────────────────────
   { category = 'Diagnostics', keys = '<leader>xx',       desc = 'Toggle the Trouble panel showing all project diagnostics' },
