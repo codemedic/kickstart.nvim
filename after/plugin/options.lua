@@ -57,6 +57,13 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
+-- Match fold column markers to line number colour.
+local function link_foldcolumn()
+  vim.api.nvim_set_hl(0, 'FoldColumn', { link = 'LineNr' })
+end
+link_foldcolumn()
+vim.api.nvim_create_autocmd('ColorScheme', { callback = link_foldcolumn })
+
 -- When nvim is invoked with +N (e.g. nvim file.txt +1234), open the fold at
 -- the cursor so the target line is immediately visible. VimEnter fires after
 -- the +line command has positioned the cursor, so zv ("view cursor line")
