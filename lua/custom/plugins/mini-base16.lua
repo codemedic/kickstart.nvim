@@ -21,7 +21,7 @@ return {
           base00 = '#040503', -- tube black (bg)
           base01 = '#1A2010', -- ANSI 0  — lighter bg, status bars, line nr
           base02 = '#1A3318', -- selection bg — ghostty selection-background
-          base03 = '#323D24', -- ANSI 8  — comments, invisibles
+          base03 = '#506840', -- comments, gutter — ~40% lerp(#323D24, fg)
           base04 = '#76A676', -- electric sage — dark fg for inactive UI
           base05 = '#A8C4A8', -- ANSI 7  — default fg, delimiters, operators
           base06 = '#D0F0C8', -- selection fg — light fg
