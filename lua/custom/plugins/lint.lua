@@ -16,6 +16,7 @@ return {
         '.markdownlint.json', '.markdownlint.jsonc',
         '.markdownlint.yaml', '.markdownlint.yml',
         '.markdownlintrc',
+        '.markdownlint-cli2.jsonc', '.markdownlint-cli2.yaml', '.markdownlint-cli2.cjs',
       },
     }
 
