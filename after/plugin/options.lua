@@ -4,6 +4,12 @@
 -- init.lua defaults this to false in GUI; override unconditionally here.
 vim.g.have_nerd_font = true
 
+-- Re-initialise mini.statusline now that have_nerd_font is correct.
+-- init.lua sets it up before this file runs, so icons would be disabled.
+require('mini.statusline').setup { use_icons = true }
+---@diagnostic disable-next-line: duplicate-set-field
+require('mini.statusline').section_location = function() return '%2l:%-2v' end
+
 -- diagflow.nvim handles diagnostic display as a top-right float; suppress the
 -- default inline virtual text to avoid duplicate/cluttered output.
 vim.diagnostic.config({ virtual_text = false })
