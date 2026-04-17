@@ -7,6 +7,7 @@ vim.o.tabstop = 4 -- Number of spaces tabs count for
 vim.o.shiftwidth = 4 -- Size of an indent
 vim.o.smartindent = true -- Insert indents automatically
 vim.opt.spelllang = { 'en_gb' }
+vim.opt.fillchars = { eob = ' ' } -- hide end-of-buffer ~ markers
 
 -- Cursor — per-mode shapes with slow-typewriter blink (long on, brief off)
 vim.opt.guicursor = table.concat({

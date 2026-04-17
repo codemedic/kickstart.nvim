@@ -1,5 +1,16 @@
 # Neovim Config — Claude Instructions
 
+## File Placement Rules
+
+**`init.lua` is read-only upstream (kickstart.nvim).** You MUST NOT edit it under any circumstances. Doing so causes merge conflicts on upstream updates.
+
+All additions MUST go in one of:
+- `after/plugin/options.lua` — vim options and `vim.opt.*` settings
+- `after/plugin/keymaps.lua` — keymaps
+- `after/plugin/gui.lua` — GUI-specific settings
+- `lua/custom/plugins/<name>.lua` — plugin specs and overrides (Lazy.nvim merges these)
+- `lua/custom/` — general custom modules
+
 ## Keybinding Tips (`lua/custom/keytips.lua`)
 
 `keytips.lua` contains a **hand-curated static list** of keybinding tips shown at startup and via `:KeyTip`.
