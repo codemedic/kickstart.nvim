@@ -1,5 +1,9 @@
 -- Custom options — kept here to avoid merge conflicts with upstream kickstart.nvim.
 
+-- diagflow.nvim handles diagnostic display as a top-right float; suppress the
+-- default inline virtual text to avoid duplicate/cluttered output.
+vim.diagnostic.config({ virtual_text = false })
+
 vim.o.sidescrolloff = 8 -- Columns of context
 vim.o.pumblend = 10 -- Popup blend
 vim.o.relativenumber = true -- Relative line numbers

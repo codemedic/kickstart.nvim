@@ -1,9 +1,8 @@
 return {
-  'dgagn/diagflow.nvim',
-  event = 'LspAttach',
-  opts = {
-    placement = 'top',
-    scope = 'line',
-    show_borders = false,
-  },
+  'rachartier/tiny-inline-diagnostic.nvim',
+  event    = 'VeryLazy',
+  priority = 1000,
+  config   = function()
+    require('tiny-inline-diagnostic').setup()
+  end,
 }
