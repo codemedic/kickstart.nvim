@@ -55,12 +55,14 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 -- When nvim is invoked with +N (e.g. nvim file.txt +1234), open the fold at
--- the cursor so the target line is immediately visible. VimEnter fires after
--- the +line command has positioned the cursor, so zv ("view cursor line")
--- does the right thing. `once = true` limits this to startup only.
+-- the cursor so the target line is immediately visible.
+-- vim.schedule defers zv until after the FileType-scheduled treesitter
+-- foldmethod reset has run; without it zv fires before folds exist.
 vim.api.nvim_create_autocmd('VimEnter', {
   once = true,
   callback = function()
-    vim.cmd('silent! normal! zv')
+    vim.schedule(function()
+      vim.cmd('silent! normal! zv')
+    end)
   end,
 })
