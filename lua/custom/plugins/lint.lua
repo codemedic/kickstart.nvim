@@ -9,6 +9,11 @@ return {
     local lint = require 'lint'
     local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
 
+    -- Use markdownlint-cli2: consistent with make lint-md / pre-commit hooks.
+    lint.linters_by_ft = vim.tbl_extend('force', lint.linters_by_ft or {}, {
+      markdown = { 'markdownlint-cli2' },
+    })
+
     -- Map of filetype → config file names that must exist in the repo.
     ---@type table<string, string[]>
     local ft_config_guards = {
