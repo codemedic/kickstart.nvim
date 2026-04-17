@@ -95,6 +95,7 @@ local tips = {
   { category = 'Git', keys = 'ih  (visual/operator)',    desc = 'Text object: select the current hunk' },
 
   -- ── Diagnostics / Trouble ─────────────────────────────────────────────
+  { category = 'Diagnostics', keys = '<leader>xb',       desc = 'Diagnostic summary — E/W/I/H counts per buffer; <C-r> to rescan all' },
   { category = 'Diagnostics', keys = '<leader>xx',       desc = 'Toggle the Trouble panel showing all project diagnostics' },
   { category = 'Diagnostics', keys = '<leader>xX',       desc = 'Toggle Trouble showing diagnostics for the current buffer only' },
   { category = 'Diagnostics', keys = '<leader>cs',       desc = 'Toggle the Trouble symbol outline for the current file' },

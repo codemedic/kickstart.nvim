@@ -8,10 +8,15 @@ vim.keymap.set('n', '<C-/>', 'gccj',     { remap = true, desc = 'Toggle line com
 vim.keymap.set('v', '<C-/>', 'gc',       { remap = true, desc = 'Toggle comment on selection' })
 vim.keymap.set('i', '<C-/>', '<C-o>gcc', { remap = true, desc = 'Toggle line comment' })
 
+-- Diagnostic summary — one line per loaded buffer, sorted by severity.
+vim.keymap.set('n', '<leader>xb', function()
+  require('custom.diag-summary').open()
+end, { desc = 'Diagnostics: summary by buffer' })
+
 -- Buffer navigation — mirrors IDE/terminal tab switching.
 -- Ctrl+PageUp/Down are freed in Ghostty (see ~/.config/ghostty/config).
-vim.keymap.set('n', '<C-PageUp>',   '<Cmd>BufferLineCyclePrev<CR>', { desc = 'Previous buffer tab' })
-vim.keymap.set('n', '<C-PageDown>', '<Cmd>BufferLineCycleNext<CR>', { desc = 'Next buffer tab' })
+vim.keymap.set('n', '<C-PageUp>',   '<Cmd>bprev<CR>', { desc = 'Previous buffer' })
+vim.keymap.set('n', '<C-PageDown>', '<Cmd>bnext<CR>', { desc = 'Next buffer' })
 
 -- Delete word backwards in insert mode.
 -- <C-BS> and <M-BS> are distinct on Ghostty (kitty keyboard protocol).
