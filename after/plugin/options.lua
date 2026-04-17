@@ -1,5 +1,9 @@
 -- Custom options — kept here to avoid merge conflicts with upstream kickstart.nvim.
 
+-- Nerd Font is available in all environments (terminal and GUI).
+-- init.lua defaults this to false in GUI; override unconditionally here.
+vim.g.have_nerd_font = true
+
 -- diagflow.nvim handles diagnostic display as a top-right float; suppress the
 -- default inline virtual text to avoid duplicate/cluttered output.
 vim.diagnostic.config({ virtual_text = false })
