@@ -6,9 +6,79 @@ vim.g.have_nerd_font = true
 
 -- Re-initialise mini.statusline now that have_nerd_font is correct.
 -- init.lua sets it up before this file runs, so icons would be disabled.
-require('mini.statusline').setup { use_icons = true }
+local statusline = require('mini.statusline')
+statusline.setup { use_icons = true }
+
 ---@diagnostic disable-next-line: duplicate-set-field
-require('mini.statusline').section_location = function() return '%2l:%-2v' end
+statusline.section_location = function() return '%2l:%-2v' end
+
+-- Branch name: git-flow prefix abbreviations (mirrors Claude Code statusline logic)
+local _BRANCH_PREFIXES = {
+  { 'feature/', 'f/' }, { 'bugfix/', 'b/' }, { 'hotfix/', 'h/' },
+  { 'release/', 'r/' }, { 'support/', 's/' }, { 'fix/', 'x/' },
+  { 'chore/',   'c/' }, { 'docs/',    'd/' },
+}
+
+-- Dynamic branch width: reuse mini's is_truncated() so laststatus=3 is handled correctly.
+local function _branch_max_width()
+  if     not statusline.is_truncated(220) then return 55
+  elseif not statusline.is_truncated(180) then return 40
+  elseif not statusline.is_truncated(120) then return 28
+  elseif not statusline.is_truncated(80)  then return 18
+  else                                         return 10
+  end
+end
+
+local function _abbrev_branch(branch)
+  for _, p in ipairs(_BRANCH_PREFIXES) do
+    if vim.startswith(branch, p[1]) then
+      branch = p[2] .. branch:sub(#p[1] + 1)
+      break
+    end
+  end
+  local max = _branch_max_width()
+  if #branch > max then branch = branch:sub(1, max - 1) .. '…' end
+  return branch
+end
+
+---@diagnostic disable-next-line: duplicate-set-field
+statusline.section_git = function(args)
+  if statusline.is_truncated(args.trunc_width) then return '' end
+  local summary = vim.b.minigit_summary_string or vim.b.gitsigns_head
+  if summary == nil then return '' end
+  -- summary format: "branch_name [+N ~N -N]" — branch is the first whitespace-delimited token
+  local branch, rest = summary:match('^(%S+)(.*)')
+  if not branch then return '' end
+  local short = _abbrev_branch(branch)
+  local icon = args.icon or (vim.g.have_nerd_font and '' or 'Git')
+  return icon .. ' ' .. short .. (rest or '')
+end
+
+-- File path relative to git repo root
+local _git_root_cache = {}
+
+local function _git_root(filepath)
+  local dir = vim.fn.fnamemodify(filepath, ':h')
+  if _git_root_cache[dir] ~= nil then return _git_root_cache[dir] end
+  local git_dir = vim.fn.finddir('.git', dir .. ';')
+  -- finddir returns '' when not found; otherwise get the parent of .git as the root
+  local root = git_dir ~= '' and vim.fn.fnamemodify(git_dir, ':p:h:h') or false
+  _git_root_cache[dir] = root
+  return root
+end
+
+---@diagnostic disable-next-line: duplicate-set-field
+statusline.section_filename = function(args)
+  if vim.bo.buftype == 'terminal' then return '%t' end
+  if statusline.is_truncated(args.trunc_width) then return '%f%m%r' end
+  local abs = vim.fn.expand('%:p')
+  if abs == '' then return '[No Name]' end
+  local root = _git_root(abs)
+  if root and vim.startswith(abs, root .. '/') then
+    return abs:sub(#root + 2) .. '%m%r'
+  end
+  return '%F%m%r'
+end
 
 -- diagflow.nvim handles diagnostic display as a top-right float; suppress the
 -- default inline virtual text to avoid duplicate/cluttered output.
