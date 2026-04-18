@@ -134,6 +134,28 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
+-- EOF padding: attach one window-height of invisible virtual lines after the
+-- last real line so the file content can scroll up naturally to the middle of
+-- the screen, avoiding the abrupt visual cliff where text ends and the blank
+-- buffer area begins. Padding is recalculated on every trigger so it stays
+-- correct after a terminal resize.
+local _eof_ns = vim.api.nvim_create_namespace('eof_padding')
+
+local function _pad_eof()
+  local buf = vim.api.nvim_get_current_buf()
+  if vim.bo[buf].buftype ~= '' then return end  -- skip non-file buffers (terminal, quickfix, etc.)
+  vim.api.nvim_buf_clear_namespace(buf, _eof_ns, 0, -1)  -- remove stale extmarks before re-adding
+  local pad_lines = vim.api.nvim_win_get_height(0)       -- one full window height of virtual space
+  local last = vim.api.nvim_buf_line_count(buf) - 1      -- 0-indexed position of the last real line
+  local virt = {}
+  for _ = 1, pad_lines do virt[#virt + 1] = {} end       -- each {} is one empty virtual line
+  vim.api.nvim_buf_set_extmark(buf, _eof_ns, last, 0, { virt_lines = virt })
+end
+
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'VimResized', 'WinResized' }, {
+  callback = _pad_eof,
+})
+
 -- When nvim is invoked with +N (e.g. nvim file.txt +1234), open the fold at
 -- the cursor so the target line is immediately visible.
 -- vim.schedule defers zv until after the FileType-scheduled treesitter
