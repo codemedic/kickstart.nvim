@@ -4,13 +4,13 @@ return {
   dependencies = {
     'nvim-lua/plenary.nvim',
     'nvim-treesitter/nvim-treesitter',
+    'lewis6991/async.nvim',
   },
   config = function()
     require('refactoring').setup()
-    require('telescope').load_extension 'refactoring'
 
     vim.keymap.set({ 'n', 'x' }, '<leader>rr', function()
-      require('telescope').extensions.refactoring.refactors()
+      require('refactoring').select_refactor()
     end, { desc = '[R]efactor — open refactoring menu' })
   end,
 }
