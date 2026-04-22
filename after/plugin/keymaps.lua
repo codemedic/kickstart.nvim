@@ -23,3 +23,11 @@ vim.keymap.set('n', '<C-PageDown>', '<Cmd>bnext<CR>', { desc = 'Next buffer' })
 -- Both map to <C-w> which is Neovim's built-in word-delete.
 vim.keymap.set('i', '<C-BS>', '<C-w>', { desc = 'Delete word backwards' })
 vim.keymap.set('i', '<M-BS>', '<C-w>', { desc = 'Delete word backwards' })
+
+-- Eclipse / IntelliJ navigation compatibility.
+-- <C-g>   overrides Neovim's built-in "show file info" — intentional.
+-- <C-S-g> requires kitty keyboard protocol (Ghostty).
+vim.keymap.set('n', '<C-g>',   'grd',   { remap = true, desc = 'Go to definition (Eclipse Ctrl+G)' })
+vim.keymap.set('n', '<C-S-g>', 'grr',   { remap = true, desc = 'Find references (Eclipse Ctrl+Shift+G)' })
+vim.keymap.set('n', '<M-Left>',  '<C-o>', { desc = 'Navigate back (Eclipse Alt+Left)' })
+vim.keymap.set('n', '<M-Right>', '<C-i>', { desc = 'Navigate forward (Eclipse Alt+Right)' })
