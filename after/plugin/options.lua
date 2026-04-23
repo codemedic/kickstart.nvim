@@ -152,8 +152,17 @@ local function _pad_eof()
   vim.api.nvim_buf_set_extmark(buf, _eof_ns, last, 0, { virt_lines = virt })
 end
 
-vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'VimResized', 'WinResized' }, {
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'VimResized', 'WinResized', 'TextChanged', 'InsertLeave' }, {
   callback = _pad_eof,
+})
+
+-- Clear padding on InsertEnter so the cursor isn't stranded below virtual lines
+-- when pressing `o` on the last line (or any insert that adds lines).
+vim.api.nvim_create_autocmd('InsertEnter', {
+  callback = function()
+    local buf = vim.api.nvim_get_current_buf()
+    vim.api.nvim_buf_clear_namespace(buf, _eof_ns, 0, -1)
+  end,
 })
 
 -- When nvim is invoked with +N (e.g. nvim file.txt +1234), open the fold at
