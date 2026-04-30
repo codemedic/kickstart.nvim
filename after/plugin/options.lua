@@ -7,7 +7,9 @@ vim.g.have_nerd_font = true
 -- mini.icons: provides filetype icons to mini.statusline (and others).
 -- nvim-web-devicons is spec'd as `enabled = vim.g.have_nerd_font`, which is false
 -- at Lazy load time, so it never loads. mini.icons is already part of mini.nvim.
+-- The mock patches require('nvim-web-devicons') so neo-tree and others get icons.
 require('mini.icons').setup()
+MiniIcons.mock_nvim_web_devicons()
 
 -- Re-initialise mini.statusline now that have_nerd_font is correct.
 local statusline = require('mini.statusline')
