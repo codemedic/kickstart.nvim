@@ -1,2 +1,2 @@
 -- Show top-level keys; collapse nested values
-vim.wo.foldlevel = 1
+vim.wo.foldlevel = 2
