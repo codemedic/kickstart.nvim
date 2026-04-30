@@ -6,10 +6,10 @@
 
 local M = {}
 
---- Module config — override via M.setup({ position = 'top-right' })
+--- Module config — override via M.setup({ position = 'bottom-right' })
 ---@type { position: 'top-right'|'bottom-right' }
 local config = {
-  position = 'bottom-right',
+  position = 'top-right',
 }
 
 ---@alias Tip { keys: string, desc: string, category: string }
@@ -222,93 +222,103 @@ local function show_float(index, auto_advance)
     current_win = nil
   end
 
-  local tip = tips[index]
-  local max_width = math.floor(vim.o.columns * 0.32)
+  local tip   = tips[index]
+  local width = 44  -- fixed inner width
 
-  -- Word-wrap long desc to fit within max_width
-  local desc = tip.desc
-  local desc_lines = {}
-  while #desc > max_width do
-    local break_at = desc:sub(1, max_width):match '.*()%s' or max_width
-    desc_lines[#desc_lines + 1] = ' ' .. desc:sub(1, break_at - 1)
-    desc = desc:sub(break_at + 1)
+  local title  = ' 💡 Tip '
+  local footer = string.format(' %s  %d/%d  ·  n·next  c·cat  q·close', tip.category, index, #tips)
+
+  local has_leader = tip.keys:find '<[Ll]eader>' ~= nil
+  local ldr_line   = nil
+  if has_leader then
+    local mapleader = vim.g.mapleader or '\\'
+    local ldr_name  = mapleader == ' ' and 'Space' or mapleader
+    ldr_line = string.format(' <leader> = %s', ldr_name)
   end
-  desc_lines[#desc_lines + 1] = ' ' .. desc
 
-  local leader = vim.g.mapleader == ' ' and '<Space>' or (vim.g.mapleader or '\\')
-  local lines = {
-    ' Tip of the Day',
-    ' <leader> = ' .. leader,
-    '',
-    ' ' .. tip.keys,
-    '',
-  }
-  for _, l in ipairs(desc_lines) do
-    lines[#lines + 1] = l
+  local lines = { ' ' .. tip.keys, ' ' .. tip.desc, '' }
+  if ldr_line then lines[#lines + 1] = ldr_line end
+  lines[#lines + 1] = footer
+
+  -- Height = sum of visual lines each buffer line occupies at the fixed width.
+  local function vlines(text)
+    return math.max(1, math.ceil(vim.fn.strdisplaywidth(text) / width))
   end
-  lines[#lines + 1] = ''
-  lines[#lines + 1] = ' ' .. tip.category .. '  ·  ' .. string.format('%d / %d', index, #tips)
-  lines[#lines + 1] = ''
-  lines[#lines + 1] = ' n·next  c·category  q·dismiss'
-
-  local width = 0
+  local height = 0
   for _, l in ipairs(lines) do
-    width = math.max(width, vim.fn.strdisplaywidth(l) + 2)
+    height = height + vlines(l)
   end
-  width = math.min(width, max_width + 4)
 
   local buf = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
   vim.bo[buf].modifiable = false
   vim.bo[buf].bufhidden = 'wipe'
 
-  local ui = vim.api.nvim_list_uis()[1]
-  local col = ui and (ui.width - width - 2) or 10
-
-  -- Position: top-right anchors NE at row 1; bottom-right anchors SE near statusline.
+  -- Position: NE/SE anchor flush to the right edge of the screen.
   local anchor = config.position == 'top-right' and 'NE' or 'SE'
   local row    = config.position == 'top-right' and 1 or (vim.o.lines - 2)
 
   local win = vim.api.nvim_open_win(buf, false, {
-    relative = 'editor',
-    anchor = anchor,
-    row = row,
-    col = col,
-    width = width,
-    height = #lines,
-    style = 'minimal',
-    border = 'rounded',
+    relative  = 'editor',
+    anchor    = anchor,
+    row       = row,
+    col       = vim.o.columns,
+    width     = width,
+    height    = height,
+    style     = 'minimal',
+    border    = 'rounded',
+    title     = title,
+    title_pos = 'left',
     noautocmd = true,
   })
-  vim.wo[win].winblend = 25
+  vim.wo[win].winblend  = 25
+  vim.wo[win].wrap      = true
+  vim.wo[win].linebreak = true  -- wrap at word boundaries
   current_win = win
 
-  local ns = vim.api.nvim_create_namespace 'keytips'
-  vim.api.nvim_buf_add_highlight(buf, ns, 'Title',   0,          0, -1)
-  vim.api.nvim_buf_add_highlight(buf, ns, 'Comment', 1,          0, -1)  -- leader reminder
-  vim.api.nvim_buf_add_highlight(buf, ns, 'Special', 3,          0, -1)  -- keys
-  vim.api.nvim_buf_add_highlight(buf, ns, 'Type',    #lines - 4, 0, -1)  -- category
-  vim.api.nvim_buf_add_highlight(buf, ns, 'Comment', #lines - 3, 0, -1)  -- counter
-  vim.api.nvim_buf_add_highlight(buf, ns, 'Comment', #lines - 1, 0, -1)  -- hint
+  local ns          = vim.api.nvim_create_namespace 'keytips'
+  local footer_line = #lines - 1  -- 0-indexed; last line is always the footer
+  vim.api.nvim_buf_add_highlight(buf, ns, 'Special', 0,           0, -1)  -- keys
+  vim.api.nvim_buf_add_highlight(buf, ns, 'Comment', footer_line, 0, -1)  -- footer
+  if ldr_line then
+    vim.api.nvim_buf_add_highlight(buf, ns, 'Comment', footer_line - 1, 0, -1)  -- leader info
+  end
 
-  local ADVANCE_SECS   = 30
-  local COUNTDOWN_SECS = 5
+  -- Reposition flush to the right edge whenever the terminal resizes.
+  local resize_augroup = vim.api.nvim_create_augroup('keytips_resize', { clear = true })
+  vim.api.nvim_create_autocmd('VimResized', {
+    group    = resize_augroup,
+    callback = function()
+      if not vim.api.nvim_win_is_valid(win) then
+        vim.api.nvim_del_augroup_by_id(resize_augroup)
+        return
+      end
+      vim.api.nvim_win_set_config(win, {
+        relative = 'editor',
+        col      = vim.o.columns,
+        row      = config.position == 'top-right' and 1 or (vim.o.lines - 2),
+      })
+    end,
+  })
+
+  local ADVANCE_SECS      = 30
+  local COUNTDOWN_SECS    = 5
   local MAX_AUTO_ADVANCES = 2
-  local hint_line = #lines - 1  -- 0-indexed; last line is the hint
 
   local advance_timer = auto_advance and vim.uv.new_timer() or nil
   local tick_timer    = auto_advance and vim.uv.new_timer() or nil
 
-  local function set_hint(text)
+  local function set_footer(text)
     if not vim.api.nvim_buf_is_valid(buf) then return end
     vim.bo[buf].modifiable = true
-    vim.api.nvim_buf_set_lines(buf, hint_line, hint_line + 1, false, { text })
+    vim.api.nvim_buf_set_lines(buf, footer_line, footer_line + 1, false, { text })
     vim.bo[buf].modifiable = false
   end
 
   local function close()
     if advance_timer then advance_timer:stop() end
     if tick_timer    then tick_timer:stop()    end
+    vim.api.nvim_del_augroup_by_id(resize_augroup)
     if vim.api.nvim_win_is_valid(win) then
       vim.api.nvim_win_close(win, true)
     end
@@ -332,9 +342,8 @@ local function show_float(index, auto_advance)
       local remaining = ADVANCE_SECS - elapsed
       if remaining <= COUNTDOWN_SECS and remaining > 0 then
         if advance_count < MAX_AUTO_ADVANCES then
-          set_hint(string.format(' advancing in %ds…  c·category  q·dismiss', remaining))
+          set_footer(string.format(' %s  %d/%d  ·  next in %ds  q·close', tip.category, index, #tips, remaining))
         end
-        -- On the final timeout the popup just disappears — no hint needed
       end
     end))
 
