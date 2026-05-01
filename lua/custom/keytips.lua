@@ -121,6 +121,18 @@ local tips = {
   { category = 'Folds', keys = 'zr / zm',                desc = 'Open / close one more fold level globally' },
   { category = 'Folds', keys = 'zR / zM',                desc = 'Open / close ALL fold levels' },
 
+  -- ── Go: dependency management (go.nvim) ──────────────────────────────
+  { category = 'Go', keys = '<leader>gmt',               desc = 'Run go mod tidy — remove unused deps and update go.sum' },
+  { category = 'Go', keys = '<leader>gmg',               desc = 'Run go get <pkg> — prompt for a package to add or update' },
+  { category = 'Go', keys = '<leader>gmv',               desc = 'Run go mod vendor — sync the vendor/ directory' },
+  { category = 'Go', keys = '<leader>gmi',               desc = 'Run go mod init — prompt for module name to initialise a new module' },
+  { category = 'Go', keys = '<leader>gws',               desc = 'Run go work sync — sync go.work.sum with all workspace modules' },
+  { category = 'Go', keys = '<leader>gwa',               desc = 'Run go work use <path> — prompt for a path to add to the workspace' },
+  { category = 'Go', keys = '<leader>gv',                desc = 'Run govulncheck — scan module dependencies for known vulnerabilities' },
+  { category = 'Go', keys = '<leader>gmu',               desc = 'Update the module under the cursor in go.mod to the latest version (go.mod only)' },
+  { category = 'Go', keys = '<leader>gmU',               desc = 'Update ALL outdated modules in go.mod to latest in a single go get call (go.mod only)' },
+  { category = 'Go', keys = '<leader>gmr',               desc = 'Refresh go.mod update annotations — re-runs go list to check for new releases' },
+
   -- ── Misc ──────────────────────────────────────────────────────────────
   { category = 'Misc', keys = '<Esc>',                   desc = 'Clear the search highlight without moving the cursor' },
 }
@@ -274,6 +286,13 @@ local function show_float(index, auto_advance)
   vim.wo[win].winblend  = 25
   vim.wo[win].wrap      = true
   vim.wo[win].linebreak = true  -- wrap at word boundaries
+
+  -- Resize to the true visual height now that wrap/linebreak are applied.
+  local true_height = vim.api.nvim_win_text_height(win, {}).all
+  if true_height ~= height then
+    vim.api.nvim_win_set_config(win, { height = true_height })
+  end
+
   current_win = win
 
   local ns          = vim.api.nvim_create_namespace 'keytips'
@@ -297,6 +316,7 @@ local function show_float(index, auto_advance)
         relative = 'editor',
         col      = vim.o.columns,
         row      = config.position == 'top-right' and 1 or (vim.o.lines - 2),
+        height   = vim.api.nvim_win_text_height(win, {}).all,
       })
     end,
   })
