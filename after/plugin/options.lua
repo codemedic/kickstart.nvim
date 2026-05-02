@@ -88,7 +88,18 @@ end
 
 -- diagflow.nvim handles diagnostic display as a top-right float; suppress the
 -- default inline virtual text to avoid duplicate/cluttered output.
-vim.diagnostic.config({ virtual_text = false })
+-- Sign column uses Nerd Font icons when available (kickstart does not set these).
+vim.diagnostic.config {
+  virtual_text = false,
+  signs = vim.g.have_nerd_font and {
+    text = {
+      [vim.diagnostic.severity.ERROR] = '󰅚',
+      [vim.diagnostic.severity.WARN]  = '󰀪',
+      [vim.diagnostic.severity.INFO]  = '󰋽',
+      [vim.diagnostic.severity.HINT]  = '󰌶',
+    },
+  } or true,
+}
 
 vim.o.sidescrolloff = 8 -- Columns of context
 vim.o.pumblend = 10 -- Popup blend

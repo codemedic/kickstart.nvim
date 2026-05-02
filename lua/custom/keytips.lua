@@ -128,10 +128,10 @@ local tips = {
   { category = 'Go', keys = '<leader>gmi',               desc = 'Run go mod init — prompt for module name to initialise a new module' },
   { category = 'Go', keys = '<leader>gws',               desc = 'Run go work sync — sync go.work.sum with all workspace modules' },
   { category = 'Go', keys = '<leader>gwa',               desc = 'Run go work use <path> — prompt for a path to add to the workspace' },
-  { category = 'Go', keys = '<leader>gv',                desc = 'Run govulncheck — scan module dependencies for known vulnerabilities' },
+  { category = 'Go', keys = '<leader>gv',                desc = 'Run govulncheck and show vulnerabilities as diagnostics on go.mod require lines (go.mod only)' },
   { category = 'Go', keys = '<leader>gmu',               desc = 'Update the module under the cursor in go.mod to the latest version (go.mod only)' },
-  { category = 'Go', keys = '<leader>gmU',               desc = 'Update ALL outdated modules in go.mod to latest in a single go get call (go.mod only)' },
-  { category = 'Go', keys = '<leader>gmr',               desc = 'Refresh go.mod update annotations — re-runs go list to check for new releases' },
+  { category = 'Go', keys = '<leader>gmU',               desc = 'Bulk update go.mod modules — picker lets you choose patch only, patch+minor, or all (go.mod only)' },
+  { category = 'Go', keys = '<leader>gmr',               desc = 'Refresh go.mod update diagnostics — re-runs go list to check for new releases' },
 
   -- ── Misc ──────────────────────────────────────────────────────────────
   { category = 'Misc', keys = '<Esc>',                   desc = 'Clear the search highlight without moving the cursor' },

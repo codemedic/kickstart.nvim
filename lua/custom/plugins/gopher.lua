@@ -10,6 +10,18 @@ return {
     require('go.install').update_all_sync()
   end,
   config = function()
+    -- go.nvim calls the deprecated vim.lsp.stop_client() (go/utils.lua).
+    -- Replace it with a silent shim that uses the current API so the
+    -- deprecation warning never fires. Mirrors Neovim's own implementation
+    -- minus the vim.deprecate() call.
+    vim.lsp.stop_client = function(client_id, force)
+      local ids = type(client_id) == 'table' and client_id or { client_id }
+      for _, id in ipairs(ids) do
+        local c = type(id) == 'number' and vim.lsp.get_client_by_id(id) or id
+        if c and c.stop then c:stop(force) end
+      end
+    end
+
     require('custom.gomod-lens').setup()
 
     require('go').setup {
@@ -48,7 +60,6 @@ return {
             if path and path ~= '' then vim.cmd('GoWork use ' .. path) end
           end)
         end, 'Go: work use <path>')
-        map('<leader>gv',  '<Cmd>GoVulnCheck<CR>',  'Go: vulnerability check')
       end,
     })
   end,
