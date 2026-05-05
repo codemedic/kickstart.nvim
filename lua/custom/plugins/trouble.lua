@@ -7,7 +7,6 @@ return {
       -- The following example shows how to create a new mode that shows only the most severe diagnostics.
       -- Once those are resolved, less severe diagnostics will be shown.
       cascade = {
-        auto_open = true,
         mode = 'diagnostics', -- inherit from diagnostics mode
         filter = function(items)
           local severity = vim.diagnostic.severity.HINT
