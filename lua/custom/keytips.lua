@@ -48,7 +48,8 @@ local tips = {
   { category = 'Search', keys = '<leader>sn',            desc = 'Find files inside your Neovim config directory' },
 
   -- ── LSP: navigation ───────────────────────────────────────────────────
-  { category = 'LSP', keys = 'grd  /  <C-g>',           desc = 'Jump to where the symbol under the cursor is defined' },
+  { category = 'LSP', keys = 'grd',                     desc = 'Jump to where the symbol under the cursor is defined' },
+  { category = 'LSP', keys = '<C-g>  /  <C-LeftMouse>', desc = 'Smart navigate: jump to definition from a usage; on a declaration, jump to the one project reference or open the full list' },
   { category = 'LSP', keys = 'grr  /  <C-S-g>',         desc = 'List all references to the symbol under the cursor' },
   { category = 'LSP', keys = '<M-Left> / <M-Right>',    desc = 'Navigate back / forward through the jump history (Eclipse-style)' },
   { category = 'LSP', keys = 'gri',                     desc = 'Jump to the implementation of the symbol (useful for interfaces)' },

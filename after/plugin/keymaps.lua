@@ -48,3 +48,78 @@ vim.keymap.set('n', '<C-g>',   'grd',   { remap = true, desc = 'Go to definition
 vim.keymap.set('n', '<C-S-g>', 'grr',   { remap = true, desc = 'Find references (Eclipse Ctrl+Shift+G)' })
 vim.keymap.set('n', '<M-Left>',  '<C-o>', { desc = 'Navigate back (Eclipse Alt+Left)' })
 vim.keymap.set('n', '<M-Right>', '<C-i>', { desc = 'Navigate forward (Eclipse Alt+Right)' })
+
+-- Smart LSP navigation (JetBrains-style):
+--   on a usage      → jump to definition
+--   on a declaration → jump directly if one project reference, or open Trouble qflist
+--
+-- Issues the textDocument/references request from a loaded project buffer so that
+-- gopls searches the project workspace even when the cursor is in a stdlib file
+-- (gopls scopes references to the module of the requesting buffer, not the params URI).
+local function smart_lsp_navigate()
+  local bufnr = vim.api.nvim_get_current_buf()
+  if vim.bo[bufnr].buftype ~= '' then return end
+  if vim.tbl_isempty(vim.lsp.get_clients({ bufnr = bufnr })) then return end
+
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local row = cursor[1] - 1  -- 0-indexed for LSP protocol
+  local col = cursor[2]
+
+  local td_params = {
+    textDocument = { uri = vim.uri_from_bufnr(bufnr) },
+    position     = { line = row, character = col },
+  }
+
+  vim.lsp.buf_request(bufnr, 'textDocument/definition', td_params, function(_, result)
+    if not result or vim.tbl_isempty(result) then return end
+    local defs      = vim.islist(result) and result or { result }
+    local def       = defs[1]
+    local def_uri   = def.uri or def.targetUri
+    local def_range = def.range or def.targetSelectionRange or def.targetRange
+
+    if def_uri == vim.uri_from_bufnr(bufnr) and def_range.start.line == row then
+      local cwd        = vim.fn.resolve(vim.uv.cwd()) .. '/'
+      local request_buf = bufnr
+      for _, b in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.api.nvim_buf_is_loaded(b) and vim.bo[b].buftype == '' then
+          local bname = vim.fn.resolve(vim.api.nvim_buf_get_name(b))
+          if bname:sub(1, #cwd) == cwd
+              and not vim.tbl_isempty(vim.lsp.get_clients({ bufnr = b })) then
+            request_buf = b
+            break
+          end
+        end
+      end
+      local ref_params = {
+        textDocument = td_params.textDocument,
+        position     = td_params.position,
+        context      = { includeDeclaration = false },
+      }
+      vim.lsp.buf_request(request_buf, 'textDocument/references', ref_params, function(_, refs)
+        if not refs or #refs == 0 then
+          vim.notify('No references found', vim.log.levels.INFO)
+          return
+        end
+        local project_refs = vim.tbl_filter(function(ref)
+          return vim.fn.resolve(vim.uri_to_fname(ref.uri)):sub(1, #cwd) == cwd
+        end, refs)
+        if #project_refs == 0 then
+          vim.notify('No project references found', vim.log.levels.INFO)
+        elseif #project_refs == 1 then
+          vim.lsp.util.show_document(project_refs[1], 'utf-8', { focus = true })
+        else
+          local items = vim.lsp.util.locations_to_items(project_refs, 'utf-8')
+          vim.fn.setqflist({}, 'r', { title = 'References (project)', items = items })
+          vim.cmd('Trouble qflist focus=true')
+        end
+      end)
+    else
+      vim.lsp.util.show_document(def, 'utf-8', { focus = true })
+    end
+  end)
+end
+
+vim.keymap.set('n', '<C-LeftMouse>', smart_lsp_navigate,
+  { desc = 'Smart navigate: jump to definition, or show project references when on declaration' })
+vim.keymap.set('n', '<C-g>', smart_lsp_navigate,
+  { desc = 'Smart navigate: jump to definition, or show project references when on declaration' })
