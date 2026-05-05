@@ -124,6 +124,11 @@ vim.keymap.set('n', '<C-LeftMouse>', smart_lsp_navigate,
 vim.keymap.set('n', '<C-g>', smart_lsp_navigate,
   { desc = 'Smart navigate: jump to definition, or show project references when on declaration' })
 
+-- Search everywhere (GoLand double-shift equivalent).
+-- Opens as file search; type > for commands, @ for symbols, / for grep.
+vim.keymap.set('n', '<C-p>', function() require('custom.search-everywhere').open() end,
+  { desc = 'Search everywhere: files (> cmds, @ symbols, / grep)' })
+
 -- Camel-hump word motions (nvim-spider). Off by default; <leader>tc to toggle.
 -- When on, w/b/e/ge stop at camelCase and snake_case boundaries in addition to
 -- the usual word boundaries.

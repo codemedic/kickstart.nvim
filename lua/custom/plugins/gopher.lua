@@ -10,10 +10,21 @@ return {
     require('go.install').update_all_sync()
   end,
   config = function()
-    -- go.nvim calls the deprecated vim.lsp.stop_client() (go/utils.lua).
-    -- Replace it with a silent shim that uses the current API so the
-    -- deprecation warning never fires. Mirrors Neovim's own implementation
-    -- minus the vim.deprecate() call.
+    -- go.nvim calls deprecated LSP functions. Shim each one so the actual
+    -- behaviour is preserved but vim.deprecate() is never reached.
+
+    -- vim.lsp.codelens.refresh({ bufnr }) → deprecated in 0.12 (go/codelens.lua)
+    do
+      local orig = vim.lsp.codelens.refresh
+      vim.lsp.codelens.refresh = function(opts)
+        local saved = vim.deprecate
+        vim.deprecate = function() end
+        pcall(orig, opts)
+        vim.deprecate = saved
+      end
+    end
+
+    -- vim.lsp.stop_client() → deprecated (go/utils.lua)
     vim.lsp.stop_client = function(client_id, force)
       local ids = type(client_id) == 'table' and client_id or { client_id }
       for _, id in ipairs(ids) do

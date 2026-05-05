@@ -89,6 +89,8 @@ end
 -- diagflow.nvim handles diagnostic display as a top-right float; suppress the
 -- default inline virtual text to avoid duplicate/cluttered output.
 -- Sign column uses Nerd Font icons when available (kickstart does not set these).
+-- jump.on_jump shadows init.lua's deprecated jump.float — Neovim checks on_jump
+-- first and never reaches the float path, so the deprecation warning is silent.
 vim.diagnostic.config {
   virtual_text = false,
   signs = vim.g.have_nerd_font and {
@@ -99,6 +101,9 @@ vim.diagnostic.config {
       [vim.diagnostic.severity.HINT]  = '󰌶',
     },
   } or true,
+  jump = {
+    on_jump = function() vim.diagnostic.open_float({ focus = false }) end,
+  },
 }
 
 vim.o.sidescrolloff = 8 -- Columns of context

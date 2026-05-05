@@ -33,6 +33,11 @@ local tips = {
   { category = 'Buffers', keys = '<C-PageUp> / <C-PageDown>', desc = 'Switch to the previous / next buffer tab' },
   { category = 'Buffers', keys = '<leader><Space>',      desc = 'Fuzzy-pick from all open buffers' },
 
+  -- ── Search everywhere ─────────────────────────────────────────────────
+  { category = 'Search', keys = '<C-p>',     desc = 'Search everywhere — opens as file search; prefix > for commands, @ for LSP symbols, / for grep' },
+  { category = 'Search', keys = '<M-c>',     desc = 'Switch to command search (inside Search Everywhere picker)' },
+  { category = 'Search', keys = '<M-s>',     desc = 'Switch to LSP symbol search (inside Search Everywhere picker)' },
+
   -- ── Search (Telescope) ────────────────────────────────────────────────
   { category = 'Search', keys = '<leader>sf',            desc = 'Find files in the project' },
   { category = 'Search', keys = '<leader>sg',            desc = 'Live grep — search text across the whole project' },
