@@ -123,3 +123,39 @@ vim.keymap.set('n', '<C-LeftMouse>', smart_lsp_navigate,
   { desc = 'Smart navigate: jump to definition, or show project references when on declaration' })
 vim.keymap.set('n', '<C-g>', smart_lsp_navigate,
   { desc = 'Smart navigate: jump to definition, or show project references when on declaration' })
+
+-- Camel-hump word motions (nvim-spider). Off by default; <leader>tc to toggle.
+-- When on, w/b/e/ge stop at camelCase and snake_case boundaries in addition to
+-- the usual word boundaries.
+local camel_hump_enabled = false
+
+local function camel_hump_set(enabled)
+  camel_hump_enabled = enabled
+  -- w/b/e/ge in normal, operator-pending, and visual modes
+  for _, mode in ipairs({ 'n', 'o', 'x' }) do
+    for _, key in ipairs({ 'w', 'b', 'e', 'ge' }) do
+      if enabled then
+        vim.keymap.set(mode, key, function() require('spider').motion(key) end,
+          { desc = 'Spider ' .. key .. ' (camel-hump)' })
+      else
+        pcall(vim.keymap.del, mode, key)
+      end
+    end
+  end
+  -- <C-Right>/<C-Left> in normal mode are built-in motions that bypass the w/b keymaps,
+  -- so they need explicit remapping. Insert and visual modes already go through w/b.
+  if enabled then
+    vim.keymap.set('n', '<C-Right>', function() require('spider').motion('w') end,
+      { desc = 'Spider w (camel-hump)' })
+    vim.keymap.set('n', '<C-Left>',  function() require('spider').motion('b') end,
+      { desc = 'Spider b (camel-hump)' })
+  else
+    pcall(vim.keymap.del, 'n', '<C-Right>')
+    pcall(vim.keymap.del, 'n', '<C-Left>')
+  end
+  vim.notify('Camel-hump motions ' .. (enabled and 'on' or 'off'), vim.log.levels.INFO)
+end
+
+vim.keymap.set('n', '<leader>tc', function()
+  camel_hump_set(not camel_hump_enabled)
+end, { desc = 'Toggle camel-hump word motions (w/b/e/ge)' })
