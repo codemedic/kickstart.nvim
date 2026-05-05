@@ -36,6 +36,11 @@ vim.keymap.set('i', '<C-Left>',  '<C-\\><C-O>b', { desc = 'Move cursor to previo
 vim.keymap.set('v', '<C-Right>', 'w', { desc = 'Extend/contract selection to next word boundary' })
 vim.keymap.set('v', '<C-Left>',  'b', { desc = 'Extend/contract selection to previous word boundary' })
 
+-- Fold open / close — single-key shortcuts for the most common fold actions.
+-- - and + are free by default (line-navigation defaults are not useful in practice).
+vim.keymap.set('n', '-', 'zc', { desc = 'Close fold under cursor' })
+vim.keymap.set('n', '+', 'zo', { desc = 'Open fold under cursor' })
+
 -- Eclipse / IntelliJ navigation compatibility.
 -- <C-g>   overrides Neovim's built-in "show file info" — intentional.
 -- <C-S-g> requires kitty keyboard protocol (Ghostty).

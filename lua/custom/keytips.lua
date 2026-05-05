@@ -119,6 +119,7 @@ local tips = {
   { category = 'Editing', keys = '<C-BS> / <M-BS>',     desc = 'Delete word backwards in insert mode' },
 
   -- ── Folds ─────────────────────────────────────────────────────────────
+  { category = 'Folds', keys = '+ / -',                  desc = 'Open / close one fold under cursor — quick single-key shortcuts for zo / zc' },
   { category = 'Folds', keys = 'zo / zc',                desc = 'Open / close one fold under cursor' },
   { category = 'Folds', keys = 'zO / zC',                desc = 'Open / close all folds under cursor (recursive)' },
   { category = 'Folds', keys = 'za',                     desc = 'Toggle fold under cursor' },
