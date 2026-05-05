@@ -24,6 +24,13 @@ vim.keymap.set('n', '<C-PageDown>', '<Cmd>bnext<CR>', { desc = 'Next buffer' })
 vim.keymap.set('i', '<C-BS>', '<C-w>', { desc = 'Delete word backwards' })
 vim.keymap.set('i', '<M-BS>', '<C-w>', { desc = 'Delete word backwards' })
 
+-- Word-boundary navigation — mirrors JetBrains Ctrl+Left / Ctrl+Right.
+-- Insert / replace mode: move cursor one word without leaving the mode.
+vim.keymap.set('i', '<C-Right>', '<C-\\><C-O>w', { desc = 'Move cursor to next word' })
+vim.keymap.set('i', '<C-Left>',  '<C-\\><C-O>b', { desc = 'Move cursor to previous word' })
+vim.keymap.set('R', '<C-Right>', '<C-\\><C-O>w', { desc = 'Move cursor to next word' })
+vim.keymap.set('R', '<C-Left>',  '<C-\\><C-O>b', { desc = 'Move cursor to previous word' })
+
 -- Visual-mode word selection — mirrors JetBrains Ctrl+Left / Ctrl+Right.
 -- w/b move the free end of the selection to the next/prev word boundary,
 -- which naturally expands or contracts depending on cursor position vs anchor.
