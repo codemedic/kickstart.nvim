@@ -283,9 +283,10 @@ local function show_float(index, auto_advance)
     title_pos = 'left',
     noautocmd = true,
   })
-  vim.wo[win].winblend  = 25
-  vim.wo[win].wrap      = true
-  vim.wo[win].linebreak = true  -- wrap at word boundaries
+  vim.wo[win].winblend    = 25
+  vim.wo[win].wrap        = true
+  vim.wo[win].linebreak   = true  -- wrap at word boundaries
+  vim.wo[win].winhighlight = 'FloatTitle:FloatBorder'
 
   -- Resize to the true visual height now that wrap/linebreak are applied.
   local true_height = vim.api.nvim_win_text_height(win, {}).all
