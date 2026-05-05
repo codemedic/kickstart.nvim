@@ -108,6 +108,9 @@ local tips = {
   { category = 'Terminal', keys = '<leader>tt',          desc = 'Toggle the floating terminal' },
   { category = 'Terminal', keys = '<Esc><Esc>',          desc = 'Exit terminal mode and return to normal mode' },
 
+  -- ── Editing: visual selection ─────────────────────────────────────────
+  { category = 'Editing', keys = 'v + <C-Right> / <C-Left>', desc = 'In visual mode, extend or contract the selection by one word at a time — mirrors JetBrains Ctrl+Left/Right' },
+
   -- ── Editing: commenting ───────────────────────────────────────────────
   { category = 'Editing', keys = '<C-/>',               desc = 'Toggle comment — line (normal/insert, moves down) or selection (visual)' },
 

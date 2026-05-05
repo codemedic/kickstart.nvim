@@ -24,6 +24,12 @@ vim.keymap.set('n', '<C-PageDown>', '<Cmd>bnext<CR>', { desc = 'Next buffer' })
 vim.keymap.set('i', '<C-BS>', '<C-w>', { desc = 'Delete word backwards' })
 vim.keymap.set('i', '<M-BS>', '<C-w>', { desc = 'Delete word backwards' })
 
+-- Visual-mode word selection — mirrors JetBrains Ctrl+Left / Ctrl+Right.
+-- w/b move the free end of the selection to the next/prev word boundary,
+-- which naturally expands or contracts depending on cursor position vs anchor.
+vim.keymap.set('v', '<C-Right>', 'w', { desc = 'Extend/contract selection to next word boundary' })
+vim.keymap.set('v', '<C-Left>',  'b', { desc = 'Extend/contract selection to previous word boundary' })
+
 -- Eclipse / IntelliJ navigation compatibility.
 -- <C-g>   overrides Neovim's built-in "show file info" — intentional.
 -- <C-S-g> requires kitty keyboard protocol (Ghostty).
