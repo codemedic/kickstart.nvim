@@ -101,6 +101,24 @@ local tips = {
   { category = 'Git', keys = '<leader>tw',               desc = 'Toggle word-level diff highlighting — highlights individual changed words within a line, not just the whole line' },
   { category = 'Git', keys = 'ih  (visual/operator)',    desc = 'Text object for the current changed block — use with operators, e.g. `dih` deletes the hunk, `yih` yanks it' },
 
+  -- ── Git: Neogit ───────────────────────────────────────────────────────
+  { category = 'Git', keys = '<leader>gg',              desc = 'Open Neogit status — the main git UI (stage, commit, push, pull, branch, log)' },
+  { category = 'Git', keys = 's / u  (Neogit)',         desc = 'Stage / unstage the file or hunk under the cursor in the Neogit status buffer' },
+  { category = 'Git', keys = '<Tab>  (Neogit)',         desc = 'Expand or collapse a section or file to reveal individual hunks' },
+  { category = 'Git', keys = 'cc  (Neogit)',            desc = 'Open the commit editor with staged changes ready to commit' },
+  { category = 'Git', keys = 'Pp  (Neogit)',            desc = 'Push the current branch to its upstream remote' },
+  { category = 'Git', keys = 'Fp  (Neogit)',            desc = 'Pull (fetch + merge) from the upstream remote' },
+  { category = 'Git', keys = 'll  (Neogit)',            desc = 'Open the interactive log — browse commits, inspect diffs, cherry-pick' },
+  { category = 'Git', keys = 'b b  (Neogit)',           desc = 'Checkout a branch — fuzzy-pick from local and remote branches' },
+  { category = 'Git', keys = 'a  (NeogitCommitView)',   desc = 'Open the file under the cursor in the live worktree at that exact line — full LSP available once there' },
+  { category = 'Git', keys = 'q / <Esc>  (Neogit)',    desc = 'Close the Neogit panel and return to where you were' },
+
+  -- ── Git: Diffview ─────────────────────────────────────────────────────
+  { category = 'Git', keys = ':DiffviewOpen',           desc = 'Open a side-by-side diff of all working tree changes — staged and unstaged' },
+  { category = 'Git', keys = ':DiffviewFileHistory %',  desc = 'Browse the git log for the current file with a diff preview for each commit' },
+  { category = 'Git', keys = ':DiffviewFileHistory',    desc = 'Browse the full repo git log with per-commit diffs' },
+  { category = 'Git', keys = 'q  (Diffview)',           desc = 'Close the Diffview panel' },
+
   -- ── Diagnostics / Trouble ─────────────────────────────────────────────
   { category = 'Diagnostics', keys = '<leader>xb',       desc = 'Diagnostic summary — E/W/I/H counts per buffer; <C-r> to rescan all' },
   { category = 'Diagnostics', keys = '<leader>xx',       desc = 'Toggle the Trouble panel showing all project diagnostics' },
