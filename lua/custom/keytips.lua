@@ -267,8 +267,15 @@ local function show_float(index, auto_advance)
   local tip   = tips[index]
   local width = 44  -- fixed inner width
 
-  local title  = ' 💡 Tip '
-  local footer = string.format(' %s  %d/%d  ·  n·next  c·cat  q·close', tip.category, index, #tips)
+  local title = ' 💡 Tip '
+
+  -- Right-justify text to the popup's inner width.
+  local function rjust(text)
+    local pad = width - vim.fn.strdisplaywidth(text)
+    return pad > 0 and string.rep(' ', pad) .. text or text
+  end
+
+  local nav_str = ' n·next  c·cat  q·close'
 
   local has_leader = tip.keys:find '<[Ll]eader>' ~= nil
   local ldr_line   = nil
@@ -278,9 +285,23 @@ local function show_float(index, auto_advance)
     ldr_line = string.format(' <leader> = %s', ldr_name)
   end
 
-  local lines = { ' ' .. tip.keys, ' ' .. tip.desc, '' }
+  -- Line layout (0-indexed positions for highlights):
+  --   0  category (left) + n/total (right-aligned)
+  --   1  blank
+  --   2  keys              (Special hl)
+  --   3  desc
+  --   4  blank (if ldr_line) / nav_str otherwise
+  --   5  ldr_line (if present)
+  --   6  nav_str  (if ldr_line present)
+  local cat_part   = string.format(' %s', tip.category)
+  local count_part = string.format('%d/%d ', index, #tips)
+  local gap        = width - vim.fn.strdisplaywidth(cat_part) - vim.fn.strdisplaywidth(count_part)
+  local cat_line   = cat_part .. string.rep(' ', math.max(1, gap)) .. count_part
+  local lines    = { cat_line, '', ' ' .. tip.keys, ' ' .. tip.desc, '' }
   if ldr_line then lines[#lines + 1] = ldr_line end
-  lines[#lines + 1] = footer
+  lines[#lines + 1] = nav_str
+
+  local nav_line = #lines - 1  -- 0-indexed index of the nav line
 
   -- Height = sum of visual lines each buffer line occupies at the fixed width.
   local function vlines(text)
@@ -326,12 +347,14 @@ local function show_float(index, auto_advance)
 
   current_win = win
 
-  local ns          = vim.api.nvim_create_namespace 'keytips'
-  local footer_line = #lines - 1  -- 0-indexed; last line is always the footer
-  vim.api.nvim_buf_add_highlight(buf, ns, 'Special', 0,           0, -1)  -- keys
-  vim.api.nvim_buf_add_highlight(buf, ns, 'Comment', footer_line, 0, -1)  -- footer
+  local ns      = vim.api.nvim_create_namespace 'keytips'
+  local cat_end = 1 + #tip.category  -- byte offset: leading space + category name
+  vim.api.nvim_buf_add_highlight(buf, ns, 'Title',   0,        0,       cat_end)  -- category name (bold)
+  vim.api.nvim_buf_add_highlight(buf, ns, 'Comment', 0,        cat_end, -1)       -- n/total counter (dim)
+  vim.api.nvim_buf_add_highlight(buf, ns, 'Special', 2,        0,       -1)       -- keys (line 2, after blank)
+  vim.api.nvim_buf_add_highlight(buf, ns, 'Comment', nav_line, 0,       -1)       -- nav hints (dim)
   if ldr_line then
-    vim.api.nvim_buf_add_highlight(buf, ns, 'Comment', footer_line - 1, 0, -1)  -- leader info
+    vim.api.nvim_buf_add_highlight(buf, ns, 'Comment', nav_line - 1, 0, -1)  -- leader info
   end
 
   -- Reposition flush to the right edge whenever the terminal resizes.
@@ -359,10 +382,13 @@ local function show_float(index, auto_advance)
   local advance_timer = auto_advance and vim.uv.new_timer() or nil
   local tick_timer    = auto_advance and vim.uv.new_timer() or nil
 
-  local function set_footer(text)
+  local function set_footer(remaining)
     if not vim.api.nvim_buf_is_valid(buf) then return end
+    local text = remaining and remaining > 0
+      and string.format(' next in %ds  q·close', remaining)
+      or  nav_str
     vim.bo[buf].modifiable = true
-    vim.api.nvim_buf_set_lines(buf, footer_line, footer_line + 1, false, { text })
+    vim.api.nvim_buf_set_lines(buf, nav_line, nav_line + 1, false, { text })
     vim.bo[buf].modifiable = false
   end
 
@@ -393,7 +419,7 @@ local function show_float(index, auto_advance)
       local remaining = ADVANCE_SECS - elapsed
       if remaining <= COUNTDOWN_SECS and remaining > 0 then
         if advance_count < MAX_AUTO_ADVANCES then
-          set_footer(string.format(' %s  %d/%d  ·  next in %ds  q·close', tip.category, index, #tips, remaining))
+          set_footer(remaining)
         end
       end
     end))
