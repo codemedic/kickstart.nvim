@@ -183,6 +183,38 @@ vim.api.nvim_create_autocmd('InsertEnter', {
   end,
 })
 
+-- Terminal title: project [branch] · file (relative to git root or cwd)
+vim.opt.title = true
+
+local function _build_title()
+  local project = vim.fn.fnamemodify(vim.fn.getcwd(), ':t')
+  local branch  = vim.b.gitsigns_head or ''
+  local abs     = vim.fn.expand('%:p')
+  local file
+  if abs == '' then
+    file = '[No Name]'
+  else
+    local root = _git_root(abs)
+    if root and vim.startswith(abs, root .. '/') then
+      file = abs:sub(#root + 2)
+    else
+      file = vim.fn.expand('%:~:.')
+    end
+  end
+  if branch ~= '' then
+    return project .. ' [' .. branch .. '] \xc2\xb7 ' .. file
+  end
+  return project .. ' \xc2\xb7 ' .. file
+end
+
+local function _update_title()
+  vim.opt.titlestring = _build_title()
+end
+
+vim.api.nvim_create_autocmd({ 'BufEnter', 'DirChanged' }, { callback = _update_title })
+-- Re-run once gitsigns attaches and sets vim.b.gitsigns_head
+vim.api.nvim_create_autocmd('User', { pattern = 'GitSignsUpdate', callback = _update_title })
+
 -- When nvim is invoked with +N (e.g. nvim file.txt +1234), open the fold at
 -- the cursor so the target line is immediately visible.
 -- vim.schedule defers zv until after the FileType-scheduled treesitter
