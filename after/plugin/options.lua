@@ -152,6 +152,48 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
+-- Fold state persistence: save/restore manually opened and closed folds.
+-- viewoptions is restricted to 'folds' only -- cursor and method are managed
+-- separately to avoid conflicting with treesitter's dynamic foldexpr.
+vim.o.viewoptions = 'folds'
+
+local function _is_real_file(bufnr)
+  return vim.bo[bufnr].buftype == ''
+end
+
+-- General persistence across buffer switches.
+vim.api.nvim_create_autocmd('BufWinLeave', {
+  callback = function(args)
+    if not _is_real_file(args.buf) then return end
+    vim.cmd('mkview')
+  end,
+})
+
+vim.api.nvim_create_autocmd('BufWinEnter', {
+  callback = function(args)
+    if not _is_real_file(args.buf) then return end
+    vim.cmd('silent! loadview')
+  end,
+})
+
+-- External file change: save folds before reload, restore after treesitter
+-- re-attaches (vim.schedule defers until after fold recomputation).
+vim.api.nvim_create_autocmd('FileChangedShell', {
+  callback = function(args)
+    if not _is_real_file(args.buf) then return end
+    vim.cmd('mkview')
+  end,
+})
+
+vim.api.nvim_create_autocmd('FileChangedShellPost', {
+  callback = function(args)
+    if not _is_real_file(args.buf) then return end
+    vim.schedule(function()
+      vim.cmd('silent! loadview')
+    end)
+  end,
+})
+
 -- EOF padding: attach one window-height of invisible virtual lines after the
 -- last real line so the file content can scroll up naturally to the middle of
 -- the screen, avoiding the abrupt visual cliff where text ends and the blank
