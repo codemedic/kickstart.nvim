@@ -101,6 +101,9 @@ local tips = {
   { category = 'Git', keys = '<leader>tw',               desc = 'Toggle word-level diff highlighting — highlights individual changed words within a line, not just the whole line' },
   { category = 'Git', keys = 'ih  (visual/operator)',    desc = 'Text object for the current changed block — use with operators, e.g. `dih` deletes the hunk, `yih` yanks it' },
 
+  -- ── Git: AI commit message ────────────────────────────────────────────
+  { category = 'Git', keys = '<leader>ai  (gitcommit)', desc = 'Generate a conventional commit message from staged changes — uses antigravity (personal) or claude (work)' },
+
   -- ── Git: Neogit ───────────────────────────────────────────────────────
   { category = 'Git', keys = '<leader>gg',              desc = 'Open Neogit status — the main git UI (stage, commit, push, pull, branch, log)' },
   { category = 'Git', keys = 's / u  (Neogit)',         desc = 'Stage / unstage the file or hunk under the cursor in the Neogit status buffer' },
