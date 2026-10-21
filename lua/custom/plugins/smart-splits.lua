@@ -2,10 +2,7 @@ return {
   {
     'mrjones2014/smart-splits.nvim',
     event = 'VeryLazy',
-    version = '>=1.0.0',
-    dependencies = {
-      'kwkarlwang/bufresize.nvim',
-    },
+    version = '^3.0.0',
 
     keys = function()
       local splits = require 'smart-splits'
@@ -34,15 +31,6 @@ return {
         { '<leader>ssj', splits.swap_buf_down, mode = { 'n' }, desc = 'Swap buffer to below' },
         { '<leader>ssk', splits.swap_buf_up, mode = { 'n' }, desc = 'Swap buffer to above' },
         { '<leader>ssl', splits.swap_buf_right, mode = { 'n' }, desc = 'Swap buffer to right' },
-      }
-    end,
-    config = function()
-      require('smart-splits').setup {
-        resize_mode = {
-          hooks = {
-            on_leave = require('bufresize').register,
-          },
-        },
       }
     end,
   },
