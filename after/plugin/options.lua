@@ -158,7 +158,8 @@ vim.api.nvim_create_autocmd('FileType', {
 vim.o.viewoptions = 'folds'
 
 local function _is_real_file(bufnr)
-  return vim.bo[bufnr].buftype == ''
+  -- mkview/loadview raise E32 for unnamed buffers (e.g. empty scratch buffers at quit)
+  return vim.bo[bufnr].buftype == '' and vim.api.nvim_buf_get_name(bufnr) ~= ''
 end
 
 -- General persistence across buffer switches.
